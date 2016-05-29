@@ -1,0 +1,8 @@
+
+index:
+    path:     /index
+    defaults: { _controller: AppBundle:Catalog:index }
+
+get:
+    path:     /get
+    defaults: { _controller: AppBundle:Catalog:get }
