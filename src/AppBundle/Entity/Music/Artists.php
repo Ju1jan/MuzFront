@@ -42,6 +42,12 @@ class Artists
      */
     private $name;
 
+    /**
+     * @ORM\OneToOne(targetEntity="Genres")
+     * @ORM\JoinColumn(name="genre_id", referencedColumnName="id")
+     */
+    private $genre;
+
 
     /**
      * Get id
@@ -99,6 +105,14 @@ class Artists
     public function getGenreId()
     {
         return $this->genreId;
+    }
+
+    /**
+     * @return \AppBundle\Entity\Music\Genres
+     */
+    public function getGenre()
+    {
+        return $this->genre;
     }
 
     /**

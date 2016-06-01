@@ -44,6 +44,13 @@ class Songs
 
 
     /**
+     * @ORM\ManyToOne(targetEntity="Artists")
+     * @ORM\JoinColumn(name="artist_id", referencedColumnName="id")
+     */
+    private $artist;
+
+
+    /**
      * Get id
      *
      * @return int
@@ -75,6 +82,14 @@ class Songs
     public function getArtistId()
     {
         return $this->artistId;
+    }
+
+    /**
+     * @return \AppBundle\Entity\Music\Artists
+     */
+    public function getArtist()
+    {
+        return $this->artist;
     }
 
     /**
