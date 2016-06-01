@@ -47,18 +47,18 @@ class CatalogController extends Controller
         }
 
         try {
-	        $items = $builder->getQuery()->getResult();
-	        //$items = $repository->findBy(array()); // tmp // debug
-	
-	        $items = array_map(function ($entity) {
-	            return [
-	                'id'        => $entity->getID(),
-	                'artist'    => $entity->getArtist()->getName(),
-	                'song'      => $entity->getName(),
-	                'genre'     => $entity->getArtist()->getGenre()->getName(),
-	                'year'      => $entity->getYear(),
-	            ];
-	        }, $items);
+            $items = $builder->getQuery()->getResult();
+            //$items = $repository->findBy(array()); // tmp // debug
+    
+            $items = array_map(function ($entity) {
+                return [
+                    'id'        => $entity->getID(),
+                    'artist'    => $entity->getArtist()->getName(),
+                    'song'      => $entity->getName(),
+                    'genre'     => $entity->getArtist()->getGenre()->getName(),
+                    'year'      => $entity->getYear(),
+                ];
+            }, $items);
             
             $data = compact('items');
         
