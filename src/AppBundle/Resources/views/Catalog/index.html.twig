@@ -9,9 +9,8 @@
 
         <h2 class="page-header">Welcome to the MuzFront project!</h2>
 
-        <div id="dynamicContent" class="table-responsive">
-
-            <table class="table table-striped">
+        <div id="dynamicContent">
+            <table class="table table-striped table-responsive">
                 <thead>
                 <tr>
                     <th>#</th>
@@ -25,6 +24,19 @@
 
                 </tbody>
             </table>
+            <nav>
+                <ul class="pagination">
+                    <li>
+                        {#<a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>#}
+                    </li>
+                    <li>
+                        {#<a href="#">0</a>#}
+                    </li>
+                    <li>
+                        {#<a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>#}
+                    </li>
+                </ul>
+            </nav>
         </div>
 
     </div>

@@ -10,6 +10,8 @@ class CatalogController extends Controller
 {
     use JsonControllerTrait;
 
+    private $itemsPerPage = 10;
+
     public function indexAction()
     {
         return $this->render('AppBundle:Catalog:index.html.twig', array(
@@ -17,12 +19,49 @@ class CatalogController extends Controller
         ));
     }
 
-    private function input($key) {
+    private function input($key, $default = null) {
         static $request = null;
         if (null === $request) {
             $request = Request::createFromGlobals();
         }
-        return $request->query->get($key);
+        return $request->query->get($key, $default);
+    }
+
+    protected function calculatePagination($builder) {
+        $page = (int)$this->input('page', 1);
+        $page = ($page > 1) ? $page : 1; // to prevent error during silly requests with incorrect page number
+
+        $qb = clone $builder;
+        $qb->select('count(s.id)');
+        $countAll = (int)$qb->getQuery()->getSingleScalarResult();
+        unset($qb);
+
+        $firstItem = ($page - 1) ? ($page - 1) * $this->itemsPerPage : 0;
+        $lastItem = $page * $this->itemsPerPage;
+        if ($firstItem++) {
+            $builder->setFirstResult( $firstItem );
+        }
+        if ($this->itemsPerPage) {
+            $builder->setMaxResults( $this->itemsPerPage );
+        }
+
+        $lastItem = ($lastItem > $countAll) ? $countAll : $lastItem;
+        $countShowed = ($lastItem > $firstItem) ? ($lastItem - $firstItem + 1) : 0;
+
+        if ($this->itemsPerPage) {
+            $pageLast = (int)($countAll / $this->itemsPerPage) + (int)(bool)($countAll % $this->itemsPerPage);
+        } else {
+            $pageLast = $page;
+        }
+
+        return [
+            'pageCurrent'   => $page,
+            'pageLast'      => $pageLast,
+            'itemFirst'     => $countShowed ? $firstItem : null,
+            'itemLast'      => $countShowed ? $lastItem : null,
+            'itemsAll'      => $countAll,
+            'itemsShowed'   => $countShowed,
+        ];
     }
 
     public function getAction()
@@ -46,6 +85,8 @@ class CatalogController extends Controller
             $builder->andWhere('g.name = :gName')->setParameter(':gName', $gName);
         }
 
+        $pagination = $this->calculatePagination($builder);
+
         try {
             $items = $builder->getQuery()->getResult();
             //$items = $repository->findBy(array()); // tmp // debug
@@ -59,8 +100,8 @@ class CatalogController extends Controller
                     'year'      => $entity->getYear(),
                 ];
             }, $items);
-            
-            $data = compact('items');
+
+            $data = compact('items', 'pagination');
         
             return $this->jsonSuccessResponse($data);
         } catch (Exception $e) {

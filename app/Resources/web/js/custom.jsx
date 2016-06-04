@@ -36,18 +36,68 @@ var SongTable = React.createClass({
     }
 });
 
+var PaginationRow = React.createClass({
+    render: function() {
+        var i,
+            pages = [],
+            pagination = this.props.pagination;
+
+        for (i =1; i < pagination.pageLast + 1; i++) {
+            pages.push({
+                id: i,
+                link: '?page=' + i,
+                value: i,
+                current: (i == pagination.pageCurrent)
+            });
+        }
+
+        return (
+            <nav>
+                <ul className="pagination">
+                    <li>
+                        <a href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {pages.map(function(pg) {
+                        return (
+                            <li className={pg.current ? 'active' : ''} key={pg.id}>
+                                <a href={pg.link}>{pg.value}</a>
+                            </li>);
+                    })}
+
+                    <li>
+                        <a href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        );
+    }
+});
+
 
 var FilterableSongTable = React.createClass({
     getInitialState: function() {
         return {
-            items: this.props.songs || []
+            items: this.props.songs || [],
+            pagination: {
+                pageCurrent: 0,
+                pageLast:    0,
+                itemFirst:   null,
+                itemLast:    null,
+                itemsAll:    0,
+                itemsShowed: 0
+            }
         };
     },
 
     componentDidMount: function() {
         this.serverRequest = $.get('/get', function (result) {
             this.setState({
-                items: result.items
+                items: result.items,
+                pagination: result.pagination,
             });
         }.bind(this));
     },
@@ -57,8 +107,32 @@ var FilterableSongTable = React.createClass({
     },
 
     render: function() {
+        var rows = [],
+            items = this.state.items,
+            pagination = this.state.pagination;
+
+        items.forEach(function(song) {
+            rows.push(<SongRow song={song} key={song.id} />);
+        });
+
         return (
-            <SongTable songs={this.state.items} />
+            <section>
+                <table className="table table-striped table-responsive">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artist</th>
+                        <th>Song</th>
+                        <th>Genre</th>
+                        <th>Year</th>
+                    </tr>
+                    </thead>
+                    <tbody>{rows}</tbody>
+                </table>
+                <div className="pagination-row">
+                    <PaginationRow pagination={pagination} />
+                </div>
+            </section>
         );
     }
 });
