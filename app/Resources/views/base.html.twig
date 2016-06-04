@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-        <script src="{{ asset('js/scripts.js') }}"></script>
-        <link rel="stylesheet" href="{{ asset('css/styles.css') }}"/>
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    {% block stylesheets %}{% endblock %}
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}"/>
+</head>
+<body>
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
@@ -46,7 +45,9 @@
     <div class="container" role="main">
         {% block body %}{% endblock %}
     </div>
+    <script src="{{ asset('js/libs.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
 
-        {% block javascripts %}{% endblock %}
-    </body>
+    {% block javascripts %}{% endblock %}
+</body>
 </html>
