@@ -50,8 +50,9 @@ class LoadMusicData implements FixtureInterface, ContainerAwareInterface
 		foreach ($items as $name) {
 			$entity = new Music\Genres();
 			$entity->setName($name);
-			$this->save($entity);
+			$this->manager->persist($entity);
 		}
+		$this->manager->flush();
 	}
 
 	private function seedSongs()
@@ -140,8 +141,9 @@ class LoadMusicData implements FixtureInterface, ContainerAwareInterface
 				$entity->setName($name);
 				$entity->setArtistId($artist->getID());
 				$entity->setYear(rand(1914, 2016));
-				$this->save($entity);
+				$this->manager->persist($entity);
 			}
+			$this->manager->flush();
 		}
 	}
 
@@ -233,6 +235,13 @@ class LoadMusicData implements FixtureInterface, ContainerAwareInterface
 		$em = $this->getEntityManager();
 		$repository = $em->getRepository('AppBundle:Music\Genres');
 
+
+		// TODO: fix this bad code
+		// it worked good during first iteration, but now something is wrong..
+		$connection = $em->getConnection();
+		$connection->query('SET FOREIGN_KEY_CHECKS=0'); // !WTF!??
+
+
 		foreach ($items as $country => $list) {
 			foreach ($list as $band => $genre) {
 				if (!isset($$country)) continue;
@@ -247,8 +256,9 @@ class LoadMusicData implements FixtureInterface, ContainerAwareInterface
 				$entity->setGenreId($objGenre->getID());
 				$entity->setCountryId($$country->getID());
 
-				$this->save($entity);
+				$this->manager->persist($entity);
 			}
+			$this->manager->flush();
 		}
 
 		/**

@@ -39,8 +39,7 @@ Example:
 
 4) Run DB seed to fill demo data
 
-    $ php app/console doctrine:fixtures:load
-    $ doctrine:fixtures:load --fixtures=src/AppBundle/DataFixtures/ORM/ --append
+    $ php app/console doctrine:fixtures:load --fixtures=src/AppBundle/DataFixtures/ORM/ --append
 
 That's all according back-end. One more step to build front-end files.
 
@@ -51,6 +50,12 @@ That's all according back-end. One more step to build front-end files.
     $ gulp
 
 NB! You should have npm, bower and gulp installed in your OS. Build's files are not stored in git repository.
+
+If you dont't have it, please follow the documentation to install npm https://github.com/nodesource/distributions
+and them run these:
+
+    $ npm install -g bower
+    $ npm install -g gulp
 
 6) Profit!
 That's all. Enjoy your day:)
