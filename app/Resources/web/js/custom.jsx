@@ -1,3 +1,8 @@
+var $storage = $('#storage'),
+    artistsCount = $storage.data('artists-count'),
+    countriesCount = $storage.data('countries-count'),
+    ajaxUrl = $storage.data('ajax-url');
+
 var Url = {
     params: {},
 
@@ -134,15 +139,26 @@ var FilterableSongTable = React.createClass({
             this.serverRequest.abort(); // To stop previous request if exist
         }
 
-        // TODO: Catch unsuccessful responses (errors 500, without data and etc)
-        this.serverRequest = $.get(window.location.href + '/get' + Url.paramsQuery(), function (result) {
-            $('#dynamicContent').removeClass('loading');
-            console.info('...loadServerData ready.');
+        // TODO: use post request
+        this.serverRequest = $.get(ajaxUrl + Url.paramsQuery(), function (response) {
+            if ('string' !== typeof(response.msg) || 'OK' !== response.msg) {
+                console.error('Oops! Response does not have any data', response);
+                return false;
+            }
             this.setState({
-                items: result.items,
-                pagination: result.pagination
+                items: response.items,
+                pagination: response.pagination
             });
-        }.bind(this));
+        }.bind(this))
+            .done(function() {
+                console.info('...loadServerData ready.');
+            })
+            .fail(function(e) {
+                console.error('Oops! Ajax request failed', e);
+            })
+            .always(function () {
+                $('#dynamicContent').removeClass('loading');
+            });
     },
 
     componentDidMount: function () {
@@ -254,9 +270,13 @@ var FilterableSongTable = React.createClass({
                     </ul>
                     <PaginationRow pagination={pagination} songTable={this}/>
                 </nav>
-                <p className="in-progress">
-                    <span className="glyphicon glyphicon-refresh rotating"></span>
-                </p>
+                <div className="in-progress">
+                    <p>
+                        <span className="glyphicon glyphicon-refresh rotating"></span>
+                    </p>
+                    <p className="text-center">Loading...</p>
+                    <p className="text-center">Table is being built using songs from {countriesCount} countries and {artistsCount} artists.</p>
+                </div>
             </section>
         );
     }

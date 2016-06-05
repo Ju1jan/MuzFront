@@ -3,7 +3,11 @@
 {% block title %}MuzFront::index{% endblock %}
 
 {% block body %}
-
+    <div id="storage"
+         data-ajax-url="{{ url('get') }}"
+         data-artists-count="{{ artists|length }}"
+         data-countries-count="{{ countries|length }}">
+    </div>
 
     <div class="col-md-8">
 
@@ -13,9 +17,9 @@
             <table class="table table-striped table-responsive">
                 <thead>
                 <tr>
-                    <th>#</th>
                     <th>Artist</th>
                     <th>Song</th>
+                    <th>Country</th>
                     <th>Genre</th>
                     <th>Year</th>
                 </tr>
@@ -37,9 +41,11 @@
                     </li>
                 </ul>
             </nav>
-            <p class="in-progress">
-                <span class="glyphicon glyphicon-refresh rotating"></span>
-            </p>
+            <div class="in-progress">
+                <p>
+                    <span class="glyphicon glyphicon-refresh rotating"></span>
+                </p>
+            </div>
         </div>
 
     </div>
