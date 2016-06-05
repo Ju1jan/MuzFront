@@ -11,6 +11,7 @@ var Url = {
             // assumption: we don't have arrays in url parameters
             Url.params[key] = decodeURIComponent(value);
         }
+        return this;
     },
 
     paramsQuery: function () {
@@ -27,6 +28,7 @@ var Url = {
     update: function () {
         let url = window.location.pathname + Url.paramsQuery();
         window.history.pushState("MuzFront", "Title", url);
+        return this;
     },
 
     getParam: function (key, def) {
@@ -38,6 +40,7 @@ var Url = {
 
     setParam: function (key, value) {
         Url.params[key] = value;
+        return this;
     }
 };
 
@@ -83,11 +86,11 @@ var PaginationRow = React.createClass({
         if (pageNext > pagination.pageLast) {pageNext = false;}
 
         return (
-            <ul className="pagination">
+            <ul className="pagination pages">
                 <li>
-                    <a href="#" aria-label="Previous">
+                    <span aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
-                    </a>
+                    </span>
                 </li>
                 {pages.map(function (pg) {
                     return (
@@ -97,9 +100,9 @@ var PaginationRow = React.createClass({
                         </li>);
                 })}
                 <li>
-                    <a href="#" aria-label="Next">
+                    <span aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
-                    </a>
+                    </span>
                 </li>
             </ul>
         );
@@ -154,6 +157,12 @@ var FilterableSongTable = React.createClass({
         this.updateTable();
     },
 
+    handleCountClick: function (count) {
+        // count of items per page
+        Url.setParam('showed', count);
+        this.updateTable();
+    },
+
     handleThClick: function (sortBy) {
         Url.setParam('sort', sortBy);
         this.updateTable();
@@ -161,13 +170,15 @@ var FilterableSongTable = React.createClass({
 
     handleExternal: function (field, value) {
         console.log('FilterableSongTable :: External handler', field, value);
-        Url.setParam(field, value);
+        Url.setParam(field, value).setParam('page', 1);
         this.updateTable();
     },
 
     render: function () {
-        let rows = [],
+        let table = this,
+            rows = [],
             items = this.state.items,
+            counts = [10, 25, 50], // each element is possible count of items per page
             pagination = this.state.pagination;
 
         items.forEach(function (song) {
@@ -189,6 +200,17 @@ var FilterableSongTable = React.createClass({
                     <tbody>{rows}</tbody>
                 </table>
                 <nav className="pagination-row">
+                    <ul className="pagination counts pull-right">
+                        <li><span>Items on page:</span></li>
+                        {counts.map(function (count) {
+                            return (
+                                <li onClick={() => table.handleCountClick(count) }
+                                    className={count === pagination.itemsOnPage ? 'active' : ''} key={count}>
+                                    <span>{count}</span>
+                                </li>
+                            );
+                        })}
+                    </ul>
                     <PaginationRow pagination={pagination} songTable={this}/>
                 </nav>
                 <p className="in-progress">
@@ -204,7 +226,7 @@ $('#filter').find('select').on('change', function () {
     if ('function' === typeof window.updateDynamicTable) {
         updateDynamicTable($name, this.value);
     } else {
-        console.warn('Oops. Alias of external method does not exist');
+        console.warn('Oops. Alias for external method does not exist');
     }
 });
 

@@ -12,6 +12,12 @@ class CatalogController extends Controller
 
     protected $itemsPerPage = 10;
 
+    function __construct()
+    {
+        // `showed` - items per page
+        $this->itemsPerPage = (int)$this->input('showed', $this->itemsPerPage);
+    }
+
     public function indexAction()
     {
         $maxItems = 80; // just inc case // <- TODO: move in config
@@ -39,9 +45,12 @@ class CatalogController extends Controller
         $genres = $builder->getQuery()->getResult();
 
         return $this->render('AppBundle:Catalog:index.html.twig', array(
-            'artists' => $artists,
-            'genres' => $genres,
-            'years' => $years,
+            'artists'   => $artists,
+            'genres'    => $genres,
+            'years'     => $years,
+            'aid'  => (int)$this->input('aid'),
+            'gid'  => (int)$this->input('gid'),
+            'year' => (int)$this->input('year'),
         ));
     }
 
@@ -114,6 +123,7 @@ class CatalogController extends Controller
             'itemLast'      => $countShowed ? $lastItem : null,
             'itemsAll'      => $countAll,
             'itemsShowed'   => $countShowed,
+            'itemsOnPage'  => $this->itemsPerPage,
         ];
     }
 

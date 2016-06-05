@@ -23,6 +23,20 @@ body > div.container {
   th {
     cursor: pointer;
   }
+
+  .counts li:first-child,
+  .pages li:first-child,
+  .pages li:last-child {
+    span {
+      cursor: default;
+      color: #444;
+    }
+    opacity: .5;
+  }
+}
+
+#filter > h4:first-child {
+  margin-top: 25px;
 }
 
 @-webkit-keyframes rotating {
