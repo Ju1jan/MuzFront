@@ -45,7 +45,34 @@
     </div>
 
     <div class="col-md-4">
+
         <h2 class="page-header">Filter</h2>
+
+        <section id="filter">
+            <div class="form-group">
+                <select name="aid" class="form-control">
+                    {% for i,entity in artists %}
+                        <option value="{{ entity.id }}">{{ entity.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <select name="gid" class="form-control">
+                    {% for i,entity in genres %}
+                        <option value="{{ entity.id }}">{{ entity.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <select name="years" class="form-control">
+                    {% for i,entity in years %}
+                        <option value="{{ entity.id }}">{{ entity.year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </section>
 
     </div>
 

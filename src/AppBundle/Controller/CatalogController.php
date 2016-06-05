@@ -10,16 +10,69 @@ class CatalogController extends Controller
 {
     use JsonControllerTrait;
 
-    private $itemsPerPage = 10;
+    protected $itemsPerPage = 10;
 
     public function indexAction()
     {
+        $maxItems = 80; // just inc case // <- TODO: move in config
+        $em = $this->get('doctrine')->getManager('default');
+
+        $repository = $em->getRepository('AppBundle:Music\Artists');
+        $builder = $repository->createQueryBuilder('a')
+            ->select('a.id, a.name')
+            ->groupBy('a.name')
+            ->setMaxResults($maxItems);
+        $artists = $builder->getQuery()->getResult();
+
+        $repository = $em->getRepository('AppBundle:Music\Songs');
+        $builder = $repository->createQueryBuilder('s')
+            ->select('s.id, s.year')
+            ->groupBy('s.year')
+            ->setMaxResults($maxItems);
+        $years = $builder->getQuery()->getResult();
+
+        $repository = $em->getRepository('AppBundle:Music\Genres');
+        $builder = $repository->createQueryBuilder('g')
+            ->select('g.id, g.name')
+            ->groupBy('g.name')
+            ->setMaxResults($maxItems);
+        $genres = $builder->getQuery()->getResult();
+
         return $this->render('AppBundle:Catalog:index.html.twig', array(
-            // ...
+            'artists' => $artists,
+            'genres' => $genres,
+            'years' => $years,
         ));
     }
 
-    private function input($key, $default = null) {
+    protected function inputOrderField() {
+        $field = trim(strtolower($this->input('sort')));
+        switch ($field) {
+            case 'song':
+                $field = 's.name';
+                break;
+            case 'artist':
+                $field = 'a.name';
+                break;
+            case 'genre':
+                $field = 'g.name';
+                break;
+            case 'year':
+                $field = 's.year';
+                break;
+            default:
+                $field = null;
+        }
+        return $field;
+    }
+
+    protected function inputOrderDirection() {
+        $field = trim(strtoupper($this->input('dir', 'DESC')));
+        $field = ('DESC' === $field) ? 'DESC' : 'ASC';
+        return $field;
+    }
+
+    protected function input($key, $default = null) {
         static $request = null;
         if (null === $request) {
             $request = Request::createFromGlobals();
@@ -70,26 +123,39 @@ class CatalogController extends Controller
         $repository = $em->getRepository('AppBundle:Music\Songs');
 
         $aName = $this->input('artist');
+        $aId   = (int)$this->input('aid');
         $gName = $this->input('genre');
+        $gId   = (int)$this->input('gid');
+        $year  = $this->input('year');
 
         $builder = $repository
             ->createQueryBuilder('s')
             ->join('s.artist', 'a')
             ->join('a.genre', 'g');
 
-        if (isset($aName[0])) {
-            $builder->where('a.name = :aName')->setParameter(':aName', $aName);
+        if ($aId) {
+            $builder->andWhere('a.id = :aId')->setParameter(':aId', $aId);
+        } else if (isset($aName[0])) {
+            $builder->andWhere('a.name LIKE :aName')->setParameter(':aName', "$aName%");
         }
 
-        if (isset($gName[0])) {
-            $builder->andWhere('g.name = :gName')->setParameter(':gName', $gName);
+        if ($gId) {
+            $builder->andWhere('g.id = :gId')->setParameter(':gId', $gId);
+        } else if (isset($gName[0])) {
+            $builder->andWhere('g.name LIKE :gName')->setParameter(':gName', "$gName%");
         }
 
-        $pagination = $this->calculatePagination($builder);
+        if (isset($year[3])) {
+            $builder->andWhere('s.year = :year')->setParameter(':year', $year);
+        }
+
+        if ($sortBy = $this->inputOrderField()) {
+            $builder->orderBy($sortBy, $this->inputOrderDirection());
+        }
 
         try {
+            $pagination = $this->calculatePagination($builder);
             $items = $builder->getQuery()->getResult();
-            //$items = $repository->findBy(array()); // tmp // debug
     
             $items = array_map(function ($entity) {
                 return [

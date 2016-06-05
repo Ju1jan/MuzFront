@@ -16,7 +16,9 @@ var Url = {
     paramsQuery: function () {
         let key, value, i = 0, query = '';
         for (key in Url.params) {
+            if (!key || 'undefined' === typeof key) continue;
             value = Url.params[key];
+            if ('undefined' === typeof value) continue;
             query += (i++ ? '&' : '?') + key + '=' + value;
         }
         return query;
@@ -61,19 +63,24 @@ var PaginationRow = React.createClass({
     render: function () {
         let i,
             pages = [],
+            pagePrev,
+            pageNext,
             songTable = this.props.songTable,
             pagination = this.props.pagination;
 
-        console.log('pagination', pagination);
-
         for (i = 1; i < pagination.pageLast + 1; i++) {
-            console.log('pagination.pageCurrent', pagination.pageCurrent);
             pages.push({
                 id: i,
                 link: '?page=' + i,
                 current: (i == pagination.pageCurrent)
             });
         }
+
+        // TODO: implement this
+        pagePrev = pagination.pageCurrent - 1;
+        pageNext = pagination.pageCurrent + 1;
+        if (pagePrev < 1) { pagePrev = false;}
+        if (pageNext > pagination.pageLast) {pageNext = false;}
 
         return (
             <ul className="pagination">
@@ -129,6 +136,7 @@ var FilterableSongTable = React.createClass({
     },
 
     componentDidMount: function () {
+        window.updateDynamicTable = this.handleExternal;
         this.loadServerData();
     },
 
@@ -148,6 +156,12 @@ var FilterableSongTable = React.createClass({
 
     handleThClick: function (sortBy) {
         Url.setParam('sort', sortBy);
+        this.updateTable();
+    },
+
+    handleExternal: function (field, value) {
+        console.log('FilterableSongTable :: External handler', field, value);
+        Url.setParam(field, value);
         this.updateTable();
     },
 
@@ -185,6 +199,14 @@ var FilterableSongTable = React.createClass({
     }
 });
 
+$('#filter').find('select').on('change', function () {
+    var $name = $(this).attr('name');
+    if ('function' === typeof window.updateDynamicTable) {
+        updateDynamicTable($name, this.value);
+    } else {
+        console.warn('Oops. Alias of external method does not exist');
+    }
+});
 
 /*let SONGS = [
     {id: 1, year: 1989, artist: 'Whatever', song: 'SongTitle', genre: 'Reggae'},
