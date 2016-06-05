@@ -98,7 +98,7 @@
                     <select name="year" class="form-control">
                         <option value="0">Any value</option>
                         {% for i,entity in years %}
-                            <option value="{{ entity.id }}" {{ (year == entity.year) ? ' selected' : '' }}>{{ entity.year }}</option>
+                            <option value="{{ entity.year }}" {{ (year == entity.year) ? ' selected' : '' }}>{{ entity.year }}</option>
                         {% endfor %}
                     </select>
                 </div>

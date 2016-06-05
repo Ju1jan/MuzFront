@@ -24,7 +24,8 @@ At first copy config file using default
     $ copy parameters.yml.dist parameters.yml
 
 <EDIT CONFIG>
-vim app/config/parameters.yml
+
+    $ vim app/config/parameters.yml
 
 Example:
 
@@ -59,3 +60,25 @@ and them run these:
 
 6) Profit!
 That's all. Enjoy your day:)
+
+
+---
+
+## Once again. In short.
+
+So. All commands for quick start are kind of this:
+
+    $ npm install -g bower
+    $ npm install -g gulp
+    $ npm install 
+    $ bower install 
+    $ gulp
+    $ git clone git@github.com:Ju1jan/MuzFront.git
+    $ composer install --no-scripts
+    $ copy parameters.yml.dist parameters.yml
+    $ vim app/config/parameters.yml
+    $ php app/console doctrine:migrations:migrate
+    $ php app/console doctrine:fixtures:load --fixtures=src/AppBundle/DataFixtures/ORM/ --append
+    $ npm install 
+    $ bower install 
+    $ gulp

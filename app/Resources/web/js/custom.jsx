@@ -275,7 +275,9 @@ var FilterableSongTable = React.createClass({
                         <span className="glyphicon glyphicon-refresh rotating"></span>
                     </p>
                     <p className="text-center">Loading...</p>
-                    <p className="text-center">Table is being built using songs from {countriesCount} countries and {artistsCount} artists.</p>
+                    <p className="text-center">
+                        The table is being built using songs from {countriesCount} countries and {artistsCount} artists.
+                    </p>
                 </div>
             </section>
         );
@@ -293,26 +295,23 @@ $filter.find('select').on('change', function () {
     }
 
     $filter.find('div.filter-block').show();
-    if (this.value > 0) {
-        let $selectBox;
 
-        // It does not have sense to select artist and country both at the same time
-        if (name == 'aid') {
-            $selectBox = $filter.find('select[name="cid"]');
-        } else if (name == 'cid') {
-            $selectBox = $filter.find('select[name="aid"]');
-        }
+    // It does not have sense to select artist and country both at the same time
+    let $selectBox;
+    if (!!parseInt(Url.params.aid)) {
+        console.log('hide cid');
+        $selectBox = $filter.find('select[name="cid"]');
+        Url.setParam('cid', 0);
+    } else if (!!parseInt(Url.params.cid)) {
+        console.log('hide aid');
+        $selectBox = $filter.find('select[name="aid"]');
+        Url.setParam('aid', 0);
+    }
 
-        if ($selectBox.length) {
-            $selectBox.closest('div.filter-block').slideUp();
-        }
+    if (!!$selectBox && $selectBox.length) {
+        $selectBox.closest('div.filter-block').slideUp();
     }
 });
-
-/*let SONGS = [
-    {id: 1, year: 1989, artist: 'Whatever', song: 'SongTitle', genre: 'Reggae'},
-    {id: 2, year: 2006, artist: 'Any', song: 'Qwerty', genre: 'TycTycTyc'}
-];*/
 
 ReactDOM.render(
     <FilterableSongTable songs={[]}/>,
