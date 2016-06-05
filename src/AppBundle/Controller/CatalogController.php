@@ -194,16 +194,16 @@ class CatalogController extends Controller
         try {
             $pagination = $this->calculatePagination($builder);
             $items = $builder->getQuery()->getResult();
-    
             $items = array_map(function ($entity) {
                 $artist = $entity->getArtist();
+                $country = $artist->getCountry();
                 return [
                     'id'        => $entity->getID(),
                     'artist'    => $artist->getName(),
                     'song'      => $entity->getName(),
                     'genre'     => $artist->getGenre()->getName(),
                     'year'      => $entity->getYear(),
-                    'country'   => $artist->getCountry()->getName(),
+                    'country'   => ($country && $country->getID()) ? $country->getName() : '',
                 ];
             }, $items);
 

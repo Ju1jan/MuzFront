@@ -235,13 +235,6 @@ class LoadMusicData implements FixtureInterface, ContainerAwareInterface
 		$em = $this->getEntityManager();
 		$repository = $em->getRepository('AppBundle:Music\Genres');
 
-
-		// TODO: fix this bad code
-		// it worked good during first iteration, but now something is wrong..
-		$connection = $em->getConnection();
-		$connection->query('SET FOREIGN_KEY_CHECKS=0'); // !WTF!??
-
-
 		foreach ($items as $country => $list) {
 			foreach ($list as $band => $genre) {
 				if (!isset($$country)) continue;

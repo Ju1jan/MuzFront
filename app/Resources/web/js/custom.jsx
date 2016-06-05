@@ -135,7 +135,7 @@ var FilterableSongTable = React.createClass({
         }
 
         // TODO: Catch unsuccessful responses (errors 500, without data and etc)
-        this.serverRequest = $.get('/get' + Url.paramsQuery(), function (result) {
+        this.serverRequest = $.get(window.location.href + '/get' + Url.paramsQuery(), function (result) {
             $('#dynamicContent').removeClass('loading');
             console.info('...loadServerData ready.');
             this.setState({
