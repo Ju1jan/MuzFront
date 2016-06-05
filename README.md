@@ -6,16 +6,29 @@ A Symfony project created on May 28, 2016, 4:56 pm.
 
 ## QUICK LUNCH
 
-1) get code from the repository
-$ git clone git@github.com:Ju1jan/MuzFront.git
+1) get code from the repository and install PHP vendors library using composer 
+    
+    $ git clone git@github.com:Ju1jan/MuzFront.git
+    
 NB! assumption: you've got ssh key for your GitHub account
 
+To get vendors using composer please run
+
+    $ composer install --no-scripts
+    
+(if composer has been installed globally in your OS) 
+
 2) Edit the config file
+At first copy config file using default
+
+    $ copy parameters.yml.dist parameters.yml
+
 <EDIT CONFIG>
 vim app/config/parameters.yml
 
 Example:
 
+    database_port: 3306
     database_name: muz_front
     database_user: root
     database_password: r00t
