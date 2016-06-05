@@ -31,6 +31,8 @@ var Url = {
         return this;
     },
 
+    // TODO: check if does it work and update or rm :))
+    // NB: we're able to get param lin this way: (Url.param.sort), where 'sort' is name of param
     getParam: function (key, def) {
         if ('undefined' == typeof(Url.params[key])) {
             return Url.params[key];
@@ -51,9 +53,9 @@ var SongRow = React.createClass({
     render: function () {
         return (
             <tr>
-                <td>{this.props.song.id}</td>
                 <td>{this.props.song.artist}</td>
                 <td>{this.props.song.song}</td>
+                <td>{this.props.song.country}</td>
                 <td>{this.props.song.genre}</td>
                 <td>{this.props.song.year}</td>
             </tr>
@@ -128,7 +130,9 @@ var FilterableSongTable = React.createClass({
     loadServerData: function () {
         console.log('loadServerData init...');
         $('#dynamicContent').addClass('loading');
-        this.serverRequest.abort(); // To stop previous request if exist
+        if ('undefined' !== typeof this.serverRequest) {
+            this.serverRequest.abort(); // To stop previous request if exist
+        }
 
         // TODO: Catch unsuccessful responses (errors 500, without data and etc)
         this.serverRequest = $.get('/get' + Url.paramsQuery(), function (result) {
@@ -136,7 +140,7 @@ var FilterableSongTable = React.createClass({
             console.info('...loadServerData ready.');
             this.setState({
                 items: result.items,
-                pagination: result.pagination,
+                pagination: result.pagination
             });
         }.bind(this));
     },
@@ -166,8 +170,17 @@ var FilterableSongTable = React.createClass({
         this.updateTable();
     },
 
-    handleThClick: function (sortBy) {
-        Url.setParam('sort', sortBy);
+    handleThClick: function (headerField) {
+        let orderBy  = Url.params.sort || false;
+
+        if (headerField === orderBy) {
+            let orderDir = Url.params.dir  || 'DESC';
+            orderDir = ('DESC' === orderDir) ? 'ASC' : 'DESC';
+            Url.setParam('dir', orderDir);
+        } else {
+            Url.setParam('sort', headerField);
+        }
+
         this.updateTable();
     },
 
@@ -184,6 +197,21 @@ var FilterableSongTable = React.createClass({
             counts = [10, 25, 50], // each element is possible count of items per page
             pagination = this.state.pagination;
 
+        let sortableIcons = function (headerField) {
+            let orderBy  = Url.params.sort || false,
+                orderDir = Url.params.dir  || 'DESC',
+                cls = 'glyphicon glyphicon-resize-vertical';
+
+            if (headerField === orderBy) {
+                cls = 'glyphicon ';
+                cls += ('DESC' === orderDir) ? 'glyphicon-sort-by-attributes-alt' : 'glyphicon-sort-by-attributes';
+            }
+
+            return (
+                <span className={cls}></span>
+            );
+        };
+
         items.forEach(function (song) {
             rows.push(<SongRow song={song} key={song.id}/>);
         });
@@ -193,11 +221,21 @@ var FilterableSongTable = React.createClass({
                 <table className="table table-striped table-responsive">
                     <thead>
                     <tr>
-                        <th onClick={() => this.handleThClick('id') }>#</th>
-                        <th onClick={() => this.handleThClick('artist') }>Artist</th>
-                        <th onClick={() => this.handleThClick('song') }>Song</th>
-                        <th onClick={() => this.handleThClick('genre') }>Genre</th>
-                        <th onClick={() => this.handleThClick('year') }>Year</th>
+                        <th onClick={() => this.handleThClick('artist') }>
+                            Artist { sortableIcons('artist') }
+                        </th>
+                        <th onClick={() => this.handleThClick('song') }>
+                            Song { sortableIcons('song') }
+                        </th>
+                        <th onClick={() => this.handleThClick('country') }>
+                            Country { sortableIcons('country') }
+                        </th>
+                        <th onClick={() => this.handleThClick('genre') }>
+                            Genre { sortableIcons('genre') }
+                        </th>
+                        <th onClick={() => this.handleThClick('year') }>
+                            Year { sortableIcons('year') }
+                        </th>
                     </tr>
                     </thead>
                     <tbody>{rows}</tbody>

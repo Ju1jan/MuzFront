@@ -79,6 +79,9 @@ class CatalogController extends Controller
             case 'year':
                 $field = 's.year';
                 break;
+            case 'country':
+                $field = 'a.country';
+                break;
             default:
                 $field = null;
         }
@@ -86,7 +89,8 @@ class CatalogController extends Controller
     }
 
     protected function inputOrderDirection() {
-        $field = trim(strtoupper($this->input('dir', 'DESC')));
+        $default = 'DESC';
+        $field = trim(strtoupper($this->input('dir', $default)));
         $field = ('DESC' === $field) ? 'DESC' : 'ASC';
         return $field;
     }
@@ -133,7 +137,7 @@ class CatalogController extends Controller
             'itemLast'      => $countShowed ? $lastItem : null,
             'itemsAll'      => $countAll,
             'itemsShowed'   => $countShowed,
-            'itemsOnPage'  => $this->itemsPerPage,
+            'itemsOnPage'   => $this->itemsPerPage,
         ];
     }
 
