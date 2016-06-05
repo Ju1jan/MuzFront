@@ -49,44 +49,53 @@
         <h2 class="page-header">Filter</h2>
 
         <section id="filter">
-            <h4>Song's Artist</h4>
-            <div class="form-group">
-                <select name="aid" class="form-control">
-                    <option value="0">Any value</option>
-                    {% for i,entity in artists %}
-                        <option value="{{ entity.id }}" {{ (aid == entity.id) ? ' selected' : '' }}>{{ entity.name }}</option>
-                    {% endfor %}
-                </select>
+
+            <div class="filter-block">
+                <h4>Song's Artist</h4>
+                <div class="form-group">
+                    <select name="aid" class="form-control">
+                        <option value="0">Any value</option>
+                        {% for i,entity in artists %}
+                            <option value="{{ entity.id }}" {{ (aid == entity.id) ? ' selected' : '' }}>{{ entity.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
 
-            <h4>Artist's Country</h4>
-            <div class="form-group">
-                <select name="cid" class="form-control">
-                    <option value="0">Any value</option>
-                    {% for i,entity in countries %}
-                        <option value="{{ entity.id }}" {{ (cid == entity.id) ? ' selected' : '' }}>{{ entity.name }}</option>
-                    {% endfor %}
-                </select>
+            <div class="filter-block">
+                <h4>Artist's Country</h4>
+                <div class="form-group">
+                    <select name="cid" class="form-control">
+                        <option value="0">Any value</option>
+                        {% for i,entity in countries %}
+                            <option value="{{ entity.id }}" {{ (cid == entity.id) ? ' selected' : '' }}>{{ entity.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
 
-            <h4>Artist's Genre</h4>
-            <div class="form-group">
-                <select name="gid" class="form-control">
-                    <option value="0">Any value</option>
-                    {% for i,entity in genres %}
-                        <option value="{{ entity.id }}" {{ (gid == entity.id) ? ' selected' : '' }}>{{ entity.name }}</option>
-                    {% endfor %}
-                </select>
+            <div class="filter-block">
+                <h4>Artist's Genre</h4>
+                <div class="form-group">
+                    <select name="gid" class="form-control">
+                        <option value="0">Any value</option>
+                        {% for i,entity in genres %}
+                            <option value="{{ entity.id }}" {{ (gid == entity.id) ? ' selected' : '' }}>{{ entity.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
 
-            <h4>Song's Year</h4>
-            <div class="form-group">
-                <select name="year" class="form-control">
-                    <option value="0">Any value</option>
-                    {% for i,entity in years %}
-                        <option value="{{ entity.id }}" {{ (year == entity.year) ? ' selected' : '' }}>{{ entity.year }}</option>
-                    {% endfor %}
-                </select>
+            <div class="filter-block">
+                <h4>Song's Year</h4>
+                <div class="form-group">
+                    <select name="year" class="form-control">
+                        <option value="0">Any value</option>
+                        {% for i,entity in years %}
+                            <option value="{{ entity.id }}" {{ (year == entity.year) ? ' selected' : '' }}>{{ entity.year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
         </section>
 

@@ -1,0 +1,23 @@
+{
+  "name": "MuzFront",
+  "description": "Test application",
+  "main": "gulpfile.js",
+  "authors": [
+    "Ju1jan <i@juljan.by>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Ju1jan/MuzFront",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "bootstrap": "^3.3.6",
+    "react": "^15.1.0",
+    "bootstrap": "^3.3.6"
+  }
+}

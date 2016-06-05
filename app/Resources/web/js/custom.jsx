@@ -262,12 +262,30 @@ var FilterableSongTable = React.createClass({
     }
 });
 
-$('#filter').find('select').on('change', function () {
-    var $name = $(this).attr('name');
+let $filter = $('#filter');
+
+$filter.find('select').on('change', function () {
+    let name = $(this).attr('name');
     if ('function' === typeof window.updateDynamicTable) {
-        updateDynamicTable($name, this.value);
+        updateDynamicTable(name, this.value);
     } else {
         console.warn('Oops. Alias for external method does not exist');
+    }
+
+    $filter.find('div.filter-block').show();
+    if (this.value > 0) {
+        let $selectBox;
+
+        // It does not have sense to select artist and country both at the same time
+        if (name == 'aid') {
+            $selectBox = $filter.find('select[name="cid"]');
+        } else if (name == 'cid') {
+            $selectBox = $filter.find('select[name="aid"]');
+        }
+
+        if ($selectBox.length) {
+            $selectBox.closest('div.filter-block').slideUp();
+        }
     }
 });
 
