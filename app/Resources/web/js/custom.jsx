@@ -1,5 +1,49 @@
+var Url = {
+    params: {},
+
+    init: function () {
+        let i,
+            prm,
+            params = window.location.search.substring(1).split('&');
+        for (i = 0; i < params.length; i++) {
+            prm = params[i];
+            let pair = prm.split("="), key = pair[0], value = pair[1];
+            // assumption: we don't have arrays in url parameters
+            Url.params[key] = decodeURIComponent(value);
+        }
+    },
+
+    paramsQuery: function () {
+        let key, value, i = 0, query = '';
+        for (key in Url.params) {
+            value = Url.params[key];
+            query += (i++ ? '&' : '?') + key + '=' + value;
+        }
+        return query;
+    },
+
+    update: function () {
+        let url = window.location.pathname + Url.paramsQuery();
+        window.history.pushState("MuzFront", "Title", url);
+    },
+
+    getParam: function (key, def) {
+        if ('undefined' == typeof(Url.params[key])) {
+            return Url.params[key];
+        }
+        return def;
+    },
+
+    setParam: function (key, value) {
+        Url.params[key] = value;
+    }
+};
+
+
+Url.init();
+
 var SongRow = React.createClass({
-    render: function() {
+    render: function () {
         return (
             <tr>
                 <td>{this.props.song.id}</td>
@@ -12,89 +56,71 @@ var SongRow = React.createClass({
     }
 });
 
-var SongTable = React.createClass({
-    render: function() {
-        var rows = [];
-
-        this.props.songs.forEach(function(song) {
-            rows.push(<SongRow song={song} key={song.id} />);
-        });
-        return (
-            <table className="table table-striped">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Artist</th>
-                    <th>Song</th>
-                    <th>Genre</th>
-                    <th>Year</th>
-                </tr>
-                </thead>
-                <tbody>{rows}</tbody>
-            </table>
-        );
-    }
-});
 
 var PaginationRow = React.createClass({
-    render: function() {
-        var i,
+    render: function () {
+        let i,
             pages = [],
+            songTable = this.props.songTable,
             pagination = this.props.pagination;
 
-        for (i =1; i < pagination.pageLast + 1; i++) {
+        console.log('pagination', pagination);
+
+        for (i = 1; i < pagination.pageLast + 1; i++) {
+            console.log('pagination.pageCurrent', pagination.pageCurrent);
             pages.push({
                 id: i,
                 link: '?page=' + i,
-                value: i,
                 current: (i == pagination.pageCurrent)
             });
         }
 
         return (
-            <nav>
-                <ul className="pagination">
-                    <li>
-                        <a href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {pages.map(function(pg) {
-                        return (
-                            <li className={pg.current ? 'active' : ''} key={pg.id}>
-                                <a href={pg.link}>{pg.value}</a>
-                            </li>);
-                    })}
-
-                    <li>
-                        <a href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            <ul className="pagination">
+                <li>
+                    <a href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {pages.map(function (pg) {
+                    return (
+                        <li onClick={() => songTable.handlePageClick(pg.id) }
+                            className={pg.current ? 'active' : ''} key={pg.id}>
+                            <span>{pg.id}</span>
+                        </li>);
+                })}
+                <li>
+                    <a href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
         );
     }
 });
 
 
 var FilterableSongTable = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             items: this.props.songs || [],
             pagination: {
                 pageCurrent: 0,
-                pageLast:    0,
-                itemFirst:   null,
-                itemLast:    null,
-                itemsAll:    0,
+                pageLast: 0,
+                itemFirst: null,
+                itemLast: null,
+                itemsAll: 0,
                 itemsShowed: 0
             }
         };
     },
 
-    componentDidMount: function() {
-        this.serverRequest = $.get('/get', function (result) {
+    loadServerData: function () {
+        console.log('loadServerData init...');
+        $('#dynamicContent').addClass('loading');
+        this.serverRequest = $.get('/get' + Url.paramsQuery(), function (result) {
+            $('#dynamicContent').removeClass('loading');
+            console.info('...loadServerData ready.');
             this.setState({
                 items: result.items,
                 pagination: result.pagination,
@@ -102,17 +128,36 @@ var FilterableSongTable = React.createClass({
         }.bind(this));
     },
 
-    componentWillUnmount: function() {
+    componentDidMount: function () {
+        this.loadServerData();
+    },
+
+    componentWillUnmount: function () {
         this.serverRequest.abort();
     },
 
-    render: function() {
-        var rows = [],
+    updateTable: function () {
+        Url.update();
+        this.loadServerData();
+    },
+
+    handlePageClick: function (page) {
+        Url.setParam('page', page);
+        this.updateTable();
+    },
+
+    handleThClick: function (sortBy) {
+        Url.setParam('sort', sortBy);
+        this.updateTable();
+    },
+
+    render: function () {
+        let rows = [],
             items = this.state.items,
             pagination = this.state.pagination;
 
-        items.forEach(function(song) {
-            rows.push(<SongRow song={song} key={song.id} />);
+        items.forEach(function (song) {
+            rows.push(<SongRow song={song} key={song.id}/>);
         });
 
         return (
@@ -120,30 +165,33 @@ var FilterableSongTable = React.createClass({
                 <table className="table table-striped table-responsive">
                     <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Artist</th>
-                        <th>Song</th>
-                        <th>Genre</th>
-                        <th>Year</th>
+                        <th onClick={() => this.handleThClick('id') }>#</th>
+                        <th onClick={() => this.handleThClick('artist') }>Artist</th>
+                        <th onClick={() => this.handleThClick('song') }>Song</th>
+                        <th onClick={() => this.handleThClick('genre') }>Genre</th>
+                        <th onClick={() => this.handleThClick('year') }>Year</th>
                     </tr>
                     </thead>
                     <tbody>{rows}</tbody>
                 </table>
-                <div className="pagination-row">
-                    <PaginationRow pagination={pagination} />
-                </div>
+                <nav className="pagination-row">
+                    <PaginationRow pagination={pagination} songTable={this}/>
+                </nav>
+                <p className="in-progress">
+                    <span className="glyphicon glyphicon-refresh rotating"></span>
+                </p>
             </section>
         );
     }
 });
 
 
-var SONGS = [
+/*let SONGS = [
     {id: 1, year: 1989, artist: 'Whatever', song: 'SongTitle', genre: 'Reggae'},
     {id: 2, year: 2006, artist: 'Any', song: 'Qwerty', genre: 'TycTycTyc'}
-];
+];*/
 
 ReactDOM.render(
-    <FilterableSongTable songs={SONGS} />,
+    <FilterableSongTable songs={[]}/>,
     document.getElementById('dynamicContent')
 );

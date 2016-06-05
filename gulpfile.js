@@ -16,7 +16,8 @@ var path = {
     },
     dist: {
         js: 'web/js/',
-        css: 'web/css/'
+        css: 'web/css/',
+        fonts: 'web/fonts/'
     }
 };
 
@@ -44,6 +45,12 @@ gulp.task('js:babel:build', function () {
 
 gulp.task('js:build', ['js:libs:build', 'js:babel:build']);
 
+gulp.task('fonts:build', function () {
+    return gulp.src([
+        'bower_components/bootstrap/dist/fonts/*'])
+        .pipe(gulp.dest(path.dist.fonts));
+});
+
 gulp.task('css:build', function () {
     return gulp.src([
         'bower_components/bootstrap/dist/css/bootstrap.css',
@@ -63,6 +70,6 @@ gulp.task('css:watch', function () {
     return gulp.watch([path.src.less], ['css:build']);
 });
 
-gulp.task('default', ['js:build', 'css:build']);
+gulp.task('default', ['js:build', 'css:build', 'fonts:build']);
 
 gulp.task('watch', ['js:watch', 'css:watch']);
