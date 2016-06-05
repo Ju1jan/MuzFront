@@ -44,12 +44,22 @@ class CatalogController extends Controller
             ->setMaxResults($maxItems);
         $genres = $builder->getQuery()->getResult();
 
+        $repository = $em->getRepository('AppBundle:Music\Countries');
+        $builder = $repository->createQueryBuilder('c')
+            ->select('c.id, c.name')
+            ->groupBy('c.name')
+            ->setMaxResults($maxItems);
+        $countries = $builder->getQuery()->getResult();
+
         return $this->render('AppBundle:Catalog:index.html.twig', array(
             'artists'   => $artists,
             'genres'    => $genres,
             'years'     => $years,
+            'countries' => $countries,
+
             'aid'  => (int)$this->input('aid'),
             'gid'  => (int)$this->input('gid'),
+            'cid'  => (int)$this->input('cid'),
             'year' => (int)$this->input('year'),
         ));
     }
@@ -129,36 +139,50 @@ class CatalogController extends Controller
 
     public function getAction()
     {
+        // TODO: disable access by GET request
         $em = $this->get('doctrine')->getManager('default');
         $repository = $em->getRepository('AppBundle:Music\Songs');
 
         $aName = $this->input('artist');
-        $aId   = (int)$this->input('aid');
+        $aId   = (int)$this->input('aid');  // Artist ID
         $gName = $this->input('genre');
-        $gId   = (int)$this->input('gid');
+        $gId   = (int)$this->input('gid');  // Genre ID
         $year  = $this->input('year');
+        $cId   = (int)$this->input('cid');  // Country ID
 
         $builder = $repository
             ->createQueryBuilder('s')
             ->join('s.artist', 'a')
             ->join('a.genre', 'g');
 
+        # ARTIST
         if ($aId) {
             $builder->andWhere('a.id = :aId')->setParameter(':aId', $aId);
         } else if (isset($aName[0])) {
+            // TODO: search by string
             $builder->andWhere('a.name LIKE :aName')->setParameter(':aName', "$aName%");
         }
 
+        # GENRE
         if ($gId) {
             $builder->andWhere('g.id = :gId')->setParameter(':gId', $gId);
         } else if (isset($gName[0])) {
+            // TODO: search by string
             $builder->andWhere('g.name LIKE :gName')->setParameter(':gName', "$gName%");
         }
 
+        # COUNTRY
+        if ($cId) {
+            $builder->join('a.country', 'c');
+            $builder->andWhere('c.id = :cId')->setParameter(':cId', $cId);
+        }
+
+        # YEAR
         if (isset($year[3])) {
             $builder->andWhere('s.year = :year')->setParameter(':year', $year);
         }
 
+        # ORDER BY
         if ($sortBy = $this->inputOrderField()) {
             $builder->orderBy($sortBy, $this->inputOrderDirection());
         }
@@ -168,12 +192,14 @@ class CatalogController extends Controller
             $items = $builder->getQuery()->getResult();
     
             $items = array_map(function ($entity) {
+                $artist = $entity->getArtist();
                 return [
                     'id'        => $entity->getID(),
-                    'artist'    => $entity->getArtist()->getName(),
+                    'artist'    => $artist->getName(),
                     'song'      => $entity->getName(),
-                    'genre'     => $entity->getArtist()->getGenre()->getName(),
+                    'genre'     => $artist->getGenre()->getName(),
                     'year'      => $entity->getYear(),
+                    'country'   => $artist->getCountry()->getName(),
                 ];
             }, $items);
 

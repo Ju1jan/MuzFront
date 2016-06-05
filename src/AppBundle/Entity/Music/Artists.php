@@ -48,6 +48,11 @@ class Artists
      */
     private $genre;
 
+    /**
+     * @ORM\OneToOne(targetEntity="Countries")
+     * @ORM\JoinColumn(name="country_id", referencedColumnName="id")
+     */
+    private $country;
 
     /**
      * Get id
@@ -84,6 +89,14 @@ class Artists
     }
 
     /**
+     * @return \AppBundle\Entity\Music\Countries
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
      * Set genreId
      *
      * @param integer $genreId
@@ -98,7 +111,7 @@ class Artists
     }
 
     /**
-     * Get countryId
+     * Get genreId
      *
      * @return int
      */
